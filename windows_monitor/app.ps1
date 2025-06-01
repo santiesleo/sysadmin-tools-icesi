@@ -1,5 +1,3 @@
-# app.ps1
-
 function Get-TopProcesses {
     $processes = Get-Process | Sort-Object CPU -Descending | Select-Object -First 5 | 
         Select-Object Id, ProcessName, CPU, @{Name='CPUPercent';Expression={$_.CPU}}
