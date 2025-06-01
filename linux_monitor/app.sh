@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 # Función para listar procesos en formato HTML que están en estado "Running"
 get_process_table() {
     echo "<table><tr><th>PID</th><th>Nombre</th><th>% Memoria</th><th>% CPU</th><th>Acción</th></tr>"
