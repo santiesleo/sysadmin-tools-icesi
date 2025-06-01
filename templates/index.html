@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Monitor de Sistema</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        color: #fff;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #101010;
+        min-height: 100vh;
+        padding: 40px;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 1200px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .menu {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+
+      .menu button {
+        background-color: #2c2c2c;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        font-size: 14px;
+      }
+
+      .menu button:hover {
+        background-color: #3c3c3c;
+      }
+
+      .content {
+        background-color: #191919;
+        border-radius: 12px;
+        padding: 20px;
+        min-height: 400px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      th, td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #333;
+      }
+
+      th {
+        background-color: #2c2c2c;
+        font-weight: 600;
+      }
+
+      tr:hover {
+        background-color: #252525;
+      }
+
+      .input-group {
+        margin: 20px 0;
+        display: flex;
+        gap: 10px;
+      }
+
+      .input-group input {
+        flex: 1;
+        padding: 8px;
+        border: 1px solid #333;
+        border-radius: 4px;
+        background-color: #2c2c2c;
+        color: white;
+      }
+
+      .input-group button {
+        padding: 8px 16px;
+        background-color: #2c2c2c;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .input-group button:hover {
+        background-color: #3c3c3c;
+      }
+
+      #error-message {
+        color: #ff4444;
+        margin: 10px 0;
+        display: none;
+      }
+
+      #success-message {
+        color: #44ff44;
+        margin: 10px 0;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div id="menu-container"></div>
+      <div id="error-message"></div>
+      <div id="success-message"></div>
+      <div id="content" class="content">
+        <h2>Seleccione una opción del menú</h2>
+      </div>
+    </div>
+
+    <script>
+      // Cargar el menú al iniciar
+      fetch('/menu')
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('menu-container').innerHTML = html;
+        })
+        .catch(error => {
+          console.error('Error al cargar el menú:', error);
+        });
+
+      // Función para mostrar los 5 procesos que más CPU consumen
+      function showTopProcesses() {
+        fetch('/top-processes')
+          .then(response => response.text())
+          .then(html => {
+            document.getElementById('content').innerHTML = '<h2>Top 5 Procesos por CPU</h2>' + html;
+          })
+          .catch(error => {
+            showError('Error al obtener los procesos: ' + error);
+          });
+      }
+
+      // Función para mostrar información de discos
+      function showDisks() {
+        fetch('/disks')
+          .then(response => response.text())
+          .then(html => {
+            document.getElementById('content').innerHTML = '<h2>Información de Discos</h2>' + html;
+          })
+          .catch(error => {
+            showError('Error al obtener información de discos: ' + error);
+          });
+      }
+
+      // Función para mostrar el archivo más grande
+      function showLargestFile() {
+        const path = prompt('Ingrese la ruta del directorio a analizar:', '.');
+        if (path !== null) {
+          fetch(`/largest-file?path=${encodeURIComponent(path)}`)
+            .then(response => response.text())
+            .then(html => {
+              document.getElementById('content').innerHTML = '<h2>Archivo más grande</h2>' + html;
+            })
+            .catch(error => {
+              showError('Error al buscar el archivo más grande: ' + error);
+            });
+        }
+      }
+
+      // Función para mostrar información de memoria
+      function showMemoryInfo() {
+        fetch('/memory')
+          .then(response => response.text())
+          .then(html => {
+            document.getElementById('content').innerHTML = '<h2>Información de Memoria</h2>' + html;
+          })
+          .catch(error => {
+            showError('Error al obtener información de memoria: ' + error);
+          });
+      }
+
+      // Función para mostrar conexiones de red
+      function showNetworkConnections() {
+        fetch('/network')
+          .then(response => response.text())
+          .then(html => {
+            document.getElementById('content').innerHTML = '<h2>Conexiones de Red Establecidas</h2>' + html;
+          })
+          .catch(error => {
+            showError('Error al obtener conexiones de red: ' + error);
+          });
+      }
+
+      // Función para mostrar mensajes de error
+      function showError(message) {
+        const errorDiv = document.getElementById('error-message');
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+        setTimeout(() => {
+          errorDiv.style.display = 'none';
+        }, 5000);
+      }
+
+      // Función para mostrar mensajes de éxito
+      function showSuccess(message) {
+        const successDiv = document.getElementById('success-message');
+        successDiv.textContent = message;
+        successDiv.style.display = 'block';
+        setTimeout(() => {
+          successDiv.style.display = 'none';
+        }, 5000);
+      }
+    </script>
+  </body>
+</html>
